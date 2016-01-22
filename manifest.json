@@ -1,0 +1,19 @@
+{
+  "chmod": "0755",
+  "directories": [
+    "src"
+  ],
+  "files": [
+    "LICENSE"
+  ],
+  "finder": [
+    {
+      "name": "*.php",
+      "in": "."
+    }
+  ],
+  "git-version": "0.0.1",
+  "main": "src/mevolution.php",
+  "output": "dist/mevolution.phar",
+  "stub": true
+}

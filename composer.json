@@ -1,0 +1,23 @@
+{
+  "name": "mtoolkit/mtoolkit-evolutions",
+  "description": "Agile way to manage the releases of your database.",
+  "version": "0.0.1",
+  "minimum-stability": "stable",
+  "license": "LGPL-3.0+",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Michele Pagnin",
+      "email": "pagnin.michele@gmail.com",
+      "homepage": "http://mpmp.altervista.org",
+      "role": "Main Developer"
+    }
+  ],
+  "support": {
+    "email": "pagnin.michele@gmail.com"
+  },
+  "require": {
+    "php": ">=5.3.0",
+    "apache/log4php": "2.3.0"
+  }
+}
