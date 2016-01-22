@@ -80,3 +80,5 @@ To create the PHAR executable, run the following command in the root of the proj
 ```bash
 php box.phar build -c manifest.json 
 ```
+## Not supported
+- Using DELIMITER in the evolutions file.
