@@ -1,7 +1,7 @@
 {
   "name": "mtoolkit/mtoolkit-evolutions",
   "description": "Agile way to manage the releases of your database.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "minimum-stability": "stable",
   "license": "LGPL-3.0+",
   "type": "project",
