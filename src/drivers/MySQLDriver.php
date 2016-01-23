@@ -116,7 +116,7 @@ class MySQLDriver extends DatabaseDriver
     {
         $connection = $this->getConnection();
 
-        $stmt = $connection->prepare("SELECT id, up, down
+        $stmt = $connection->prepare("SELECT id, up, down, inserted, executed
             FROM mt_evolutions
             WHERE ( id>=? OR ? IS NULL )
                 AND ( id<=? OR ? IS NULL )
@@ -135,12 +135,19 @@ class MySQLDriver extends DatabaseDriver
         }
 
         $toReturn = array();
-        $stmt->bind_result($id, $up, $down);
+        $stmt->bind_result($id, $up, $down, $inserted, $executed);
         while ($stmt->fetch()) {
             $evolution = new Evolution();
             $evolution->setId($id)
                 ->setUp($up)
                 ->setDown($down);
+
+            if ($executed != null) {
+                $evolution->setExecuted(new \DateTime($executed));
+            }
+            if ($inserted != null) {
+                $evolution->setInserted(new \DateTime($inserted));
+            }
 
             $toReturn[] = $evolution;
         }
@@ -203,7 +210,7 @@ class MySQLDriver extends DatabaseDriver
     {
         $connection = $this->getConnection();
 
-        $stmt = $connection->prepare("SELECT MAX(id) AS id, up, down
+        $stmt = $connection->prepare("SELECT MAX(id) AS id
             FROM mt_evolutions
             WHERE executed IS NOT NULL");
         $result = $stmt->execute();
@@ -213,7 +220,7 @@ class MySQLDriver extends DatabaseDriver
         }
 
         $toReturn = 0;
-        $stmt->bind_result($id, $up, $down);
+        $stmt->bind_result($id);
         while ($stmt->fetch()) {
             if ($id != null) {
                 $toReturn = (int)$id;
@@ -257,6 +264,14 @@ class MySQLDriver extends DatabaseDriver
     }
 
     /**
+     * <ul>
+     *      <li>Retrieves the id of last executed evolution {@link #getLastExecutedEvolutionId}</li>
+     *      <li>Retrieves the list of the evolution to execute {@link #getEvolutions}</li>
+     *      <li>Begins the transaction</li>
+     *      <li>Runs each evolution and updates its execution date {@link #updateExecuteDate}</li>
+     *      <li>If there is any errors, commits the transaction, otherwise roll back</li>
+     * </ul>
+     *
      * @param int $to Optional
      * @throws \Exception
      */
@@ -268,16 +283,21 @@ class MySQLDriver extends DatabaseDriver
             $from = $this->getLastExecutedEvolutionId();
             /* @var Evolution[] $evolutions */
             $evolutions = $this->getEvolutions($from, $to);
-//            $connection->autocommit(FALSE);
-//            $connection->begin_transaction();
+            $connection->autocommit(FALSE);
+            $connection->begin_transaction();
 
             foreach ($evolutions as $evolution) {
+                if ($evolution->getExecuted() != null) {
+                    continue;
+                }
+
                 echo sprintf("\tAppling evolution %s...\n", $evolution->getId());
                 $this->execute($evolution->getUp());
                 $this->updateExecuteDate($evolution->getId(), new \DateTime());
                 echo sprintf("\tEvolution %s applyed without error.\n", $evolution->getId());
             }
-//            $connection->commit();
+
+            $connection->commit();
         } catch (\Exception $ex) {
             $connection->rollBack();
             throw $ex;
@@ -327,13 +347,12 @@ class MySQLDriver extends DatabaseDriver
                 /* store first result set */
                 if ($result = $connection->store_result()) {
                     while ($row = $result->fetch_row()) {
-                        printf("%s\n", $row[0]);
+                        //printf("%s\n", $row[0]);
                     }
                     $result->free();
                 }
-                /* print divider */
                 if ($connection->more_results()) {
-                    printf("-----------------\n");
+                    //printf("-----------------\n");
                 }
             } while ($connection->next_result());
         }

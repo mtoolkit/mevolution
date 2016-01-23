@@ -1,5 +1,5 @@
 <?php
-namespace mtoolkit\evolution\controller;
+namespace mtoolkit\evolution\model\commandlineargument;
 
 /**
  * Class CommandLineArgument contains all of the valid command line arguments.

@@ -3,7 +3,7 @@ namespace mtoolkit\evolution;
 
 require_once __DIR__ . '/autoload.php';
 
-use mtoolkit\evolution\controller\CommandLineArgument;
+use mtoolkit\evolution\model\commandlineargument\CommandLineArgument;
 use mtoolkit\evolution\controller\MEvolution;
 use mtoolkit\evolution\model\string\StringBook;
 
