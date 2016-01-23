@@ -50,6 +50,8 @@ abstract class DatabaseDriver
     public abstract function updateExecuteDate($id, \DateTime $executeDate);
 
     /**
+     * Sets to "<i>null</i>" the execution date of the evolution with id <i>$id</i>.
+     *
      * @param int $id Evolution id
      * @throws UpdateExecuteDateException
      */
