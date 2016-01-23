@@ -23,6 +23,16 @@ class Evolution
     private $down;
 
     /**
+     * @var \DateTime|null
+     */
+    private $inserted=null;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $executed=null;
+
+    /**
      * @return number
      */
     public function getId()
@@ -76,5 +86,39 @@ class Evolution
         return $this;
     }
 
+    /**
+     * @return \DateTime|null
+     */
+    public function getInserted()
+    {
+        return $this->inserted;
+    }
 
+    /**
+     * @param \DateTime|null $inserted
+     * @return Evolution
+     */
+    public function setInserted(\DateTime $inserted)
+    {
+        $this->inserted = $inserted;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getExecuted()
+    {
+        return $this->executed;
+    }
+
+    /**
+     * @param \DateTime|null $executed
+     * @return Evolution
+     */
+    public function setExecuted(\DateTime $executed)
+    {
+        $this->executed = $executed;
+        return $this;
+    }
 }
