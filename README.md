@@ -44,7 +44,7 @@ CREATE TABLE test01
 DROP TABLE test01;
 ```
 
-UP and DOWN placeholders are mandatory.
+**UP and DOWN placeholders are mandatory.**
 The UP queries will execute when you apply the evolutions.
 The DOWN queries will execute when you revert the evolutions.
 
