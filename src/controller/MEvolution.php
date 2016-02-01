@@ -135,7 +135,7 @@ class MEvolution
             $this->to = 0;
         }
 
-        $this->driver->executeEvolutions($this->to);
+        $this->driver->executeDevolutions($this->to);
 
         echo PHP_EOL . 'REVERT completed without errors.' . PHP_EOL;
     }
