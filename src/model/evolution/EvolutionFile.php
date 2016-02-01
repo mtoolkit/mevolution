@@ -2,6 +2,8 @@
 namespace mtoolkit\evolution\model\evolution;
 
 use mtoolkit\evolution\exception\FileNotFoundException;
+use mtoolkit\evolution\exception\NoDownPlaceholderException;
+use mtoolkit\evolution\exception\NoUpPlaceholderException;
 use mtoolkit\evolution\model\string\StringBook;
 
 class EvolutionFile
@@ -24,31 +26,37 @@ class EvolutionFile
      */
     public static function getList($path)
     {
-        $absolutePath=$path;
+        $absolutePath = $path;
         $workingFolder = getcwd();
 
-        if( file_exists($absolutePath)==false ) {
+        if (file_exists($absolutePath) == false)
+        {
             $absolutePath = realpath(sprintf('%s/%s', $workingFolder, $path));
         }
 
-        if (file_exists($absolutePath)===false) {
+        if (file_exists($absolutePath) === false)
+        {
             throw new FileNotFoundException($absolutePath);
         }
 
         $dh = opendir($absolutePath);
         $files = array();
-        while (false !== ($filename = readdir($dh))) {
-            if (in_array($filename, array('.', '..'))) {
+        while (false !== ($filename = readdir($dh)))
+        {
+            if (in_array($filename, array('.', '..')))
+            {
                 continue;
             }
 
-            if (StringBook::is($filename)->endsWith('.sql') === false) {
+            if (StringBook::is($filename)->endsWith('.sql') === false)
+            {
                 continue;
             }
 
             $basename = basename($filename, '.sql');
 
-            if (is_numeric($basename) === false) {
+            if (is_numeric($basename) === false)
+            {
                 continue;
             }
 
@@ -61,6 +69,8 @@ class EvolutionFile
     /**
      * @param string $path
      * @return Evolution
+     * @throws NoDownPlaceholderException
+     * @throws NoUpPlaceholderException
      */
     public static function getEvolution($path)
     {
@@ -70,10 +80,20 @@ class EvolutionFile
         $fileContent = file_get_contents($path);
 
         $upPosition = strpos($fileContent, EvolutionFile::UP);
-        $upPosition =($upPosition==-1 ? 0 : $upPosition);
+        if ($upPosition === false)
+        {
+            throw new NoUpPlaceholderException($basename);
+        }
+
+        $upPosition = ($upPosition == -1 ? 0 : $upPosition);
 
         $downPosition = strpos($fileContent, EvolutionFile::DOWN);
-        $downPosition = ($downPosition==-1 ? strlen($fileContent) : $downPosition);
+        if ($downPosition === false)
+        {
+            throw new NoDownPlaceholderException($basename);
+        }
+
+        $downPosition = ($downPosition == -1 ? strlen($fileContent) : $downPosition);
 
         $up = substr($fileContent, $upPosition, $downPosition);
         $down = substr($fileContent, $downPosition);
