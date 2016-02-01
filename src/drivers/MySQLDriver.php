@@ -12,6 +12,7 @@ use mtoolkit\evolution\model\settings\Settings;
 
 /**
  * Class MySQLDriver
+ *
  * @package mtooolkit\evolution\drivers
  */
 class MySQLDriver extends DatabaseDriver
@@ -20,6 +21,7 @@ class MySQLDriver extends DatabaseDriver
 
     /**
      * MySQLDriver constructor.
+     *
      * @param Settings $settings
      */
     public function __construct(Settings $settings)
@@ -39,13 +41,16 @@ class MySQLDriver extends DatabaseDriver
      */
     public function getConnection()
     {
-        if ($this->mysql == null) {
+        if ($this->mysql == null)
+        {
             $this->mysql = new \mysqli($this->getSettings()->getHost(), $this->getSettings()->getUsername(), $this->getSettings()->getPassword(), $this->getSettings()->getDbName());
         }
 
-        try {
+        try
+        {
             return $this->mysql;
-        } catch (\Exception $ex) {
+        } catch (\Exception $ex)
+        {
             throw new \Exception("Impossible to connect to the database.");
         }
     }
@@ -66,7 +71,8 @@ class MySQLDriver extends DatabaseDriver
 
         $result = $connection->query($sql);
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new CreateEvolutionsTableException('mt_evolutions');
         }
 
@@ -90,7 +96,8 @@ class MySQLDriver extends DatabaseDriver
 
         $stmt = $connection->prepare($sql);
 
-        if ($stmt === false) {
+        if ($stmt === false)
+        {
             $errorMessage = sprintf("%s: %s", ErrorNumber::EN_001, $connection->error);
             throw new \Exception($errorMessage, $connection->errno);
         }
@@ -100,7 +107,8 @@ class MySQLDriver extends DatabaseDriver
         $stmt->free_result();
         $stmt->close();
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new InsertEvolutionException();
         }
     }
@@ -122,7 +130,8 @@ class MySQLDriver extends DatabaseDriver
                 AND ( id<=? OR ? IS NULL )
             ORDER BY id ASC;");
 
-        if ($stmt === false) {
+        if ($stmt === false)
+        {
             $errorMessage = sprintf("%s: %s", ErrorNumber::EN_002, $connection->error);
             throw new \Exception($errorMessage, $connection->errno);
         }
@@ -130,22 +139,26 @@ class MySQLDriver extends DatabaseDriver
         $stmt->bind_param('iiii', $from, $from, $to, $to);
         $result = $stmt->execute();
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new GetEvolutionsException();
         }
 
         $toReturn = array();
         $stmt->bind_result($id, $up, $down, $inserted, $executed);
-        while ($stmt->fetch()) {
+        while ($stmt->fetch())
+        {
             $evolution = new Evolution();
             $evolution->setId($id)
                 ->setUp($up)
                 ->setDown($down);
 
-            if ($executed != null) {
+            if ($executed != null)
+            {
                 $evolution->setExecuted(new \DateTime($executed));
             }
-            if ($inserted != null) {
+            if ($inserted != null)
+            {
                 $evolution->setInserted(new \DateTime($inserted));
             }
 
@@ -175,7 +188,8 @@ class MySQLDriver extends DatabaseDriver
         $stmt->free_result();
         $stmt->close();
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new UpdateExecuteDateException();
         }
     }
@@ -195,7 +209,8 @@ class MySQLDriver extends DatabaseDriver
         $stmt->free_result();
         $stmt->close();
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new UpdateExecuteDateException();
         }
     }
@@ -215,14 +230,17 @@ class MySQLDriver extends DatabaseDriver
             WHERE executed IS NOT NULL");
         $result = $stmt->execute();
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new GetEvolutionsException();
         }
 
         $toReturn = 0;
         $stmt->bind_result($id);
-        while ($stmt->fetch()) {
-            if ($id != null) {
+        while ($stmt->fetch())
+        {
+            if ($id != null)
+            {
                 $toReturn = (int)$id;
             }
         }
@@ -247,13 +265,15 @@ class MySQLDriver extends DatabaseDriver
             FROM mt_evolutions");
         $result = $stmt->execute();
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new GetEvolutionsException();
         }
 
         $toReturn = 0;
         $stmt->bind_result($id);
-        while ($stmt->fetch()) {
+        while ($stmt->fetch())
+        {
             $toReturn = (int)$id;
         }
 
@@ -279,26 +299,30 @@ class MySQLDriver extends DatabaseDriver
     {
         $connection = $this->getConnection();
 
-        try {
+        try
+        {
             $from = $this->getLastExecutedEvolutionId();
             /* @var Evolution[] $evolutions */
             $evolutions = $this->getEvolutions($from, $to);
-            $connection->autocommit(FALSE);
+            $connection->autocommit(false);
             $connection->begin_transaction();
 
-            foreach ($evolutions as $evolution) {
-                if ($evolution->getExecuted() != null) {
+            foreach ($evolutions as $evolution)
+            {
+                if ($evolution->getExecuted() != null)
+                {
                     continue;
                 }
 
-                echo sprintf("\tAppling evolution %s...\n", $evolution->getId());
+                echo sprintf("\tApplying evolution %s...\n", $evolution->getId());
                 $this->execute($evolution->getUp());
                 $this->updateExecuteDate($evolution->getId(), new \DateTime());
-                echo sprintf("\tEvolution %s applyed without error.\n", $evolution->getId());
+                echo sprintf("\tEvolution %s applied without error.\n", $evolution->getId());
             }
 
             $connection->commit();
-        } catch (\Exception $ex) {
+        } catch (\Exception $ex)
+        {
             $connection->rollBack();
             throw $ex;
         }
@@ -312,23 +336,26 @@ class MySQLDriver extends DatabaseDriver
     {
         $connection = $this->getConnection();
 
-        try {
+        try
+        {
             $from = $this->getLastExecutedEvolutionId();
-            $connection->autocommit(FALSE);
+            $connection->autocommit(false);
             $connection->begin_transaction();
 
             /* @var Evolution[] $evolutions */
             $evolutions = array_reverse($this->getEvolutions($to, $from));
 
-            foreach ($evolutions as $evolution) {
-                echo sprintf("\tAppling devolution %s...\n", $evolution->getId());
+            foreach ($evolutions as $evolution)
+            {
+                echo sprintf("\tApplying devolution %s...\n", $evolution->getId());
                 $this->execute($evolution->getDown());
                 $this->dropExecuteDate($evolution->getId());
-                echo sprintf("\tDevolution %s applyed without error.\n", $evolution->getId());
+                echo sprintf("\tDevolution %s applied without error.\n", $evolution->getId());
             }
 
             $connection->commit();
-        } catch (\Exception $ex) {
+        } catch (\Exception $ex)
+        {
             $connection->rollBack();
             throw $ex;
         }
@@ -342,23 +369,29 @@ class MySQLDriver extends DatabaseDriver
     {
         $connection = $this->getConnection();
 
-        if ($connection->multi_query($sql)) {
-            do {
+        if ($connection->multi_query($sql))
+        {
+            do
+            {
                 /* store first result set */
-                if ($result = $connection->store_result()) {
-                    while ($row = $result->fetch_row()) {
+                if ($result = $connection->store_result())
+                {
+                    while ($row = $result->fetch_row())
+                    {
                         //printf("%s\n", $row[0]);
                     }
                     $result->free();
                 }
-                if ($connection->more_results()) {
+                if ($connection->more_results())
+                {
                     //printf("-----------------\n");
                 }
             } while ($connection->next_result());
         }
-
-        /* close connection */
-        // $mysqli->close();
+        else
+        {
+            throw new \Exception(printf('Error executing sql command: %s', $sql));
+        }
     }
 
     public function clean()
@@ -368,7 +401,8 @@ class MySQLDriver extends DatabaseDriver
 
         $result = $connection->query($sql);
 
-        if ($result === false) {
+        if ($result === false)
+        {
             throw new CleanEvolutionsTableException('mt_evolutions');
         }
     }
