@@ -5,6 +5,6 @@ class SettingsFileNotFoundException extends \Exception
 {
     public function __construct($filePath)
     {
-        parent::__construct(printf("The settings file %s is not found", $filePath));
+        parent::__construct(sprintf("The settings file %s is not found", $filePath));
     }
 }

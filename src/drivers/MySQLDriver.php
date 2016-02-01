@@ -390,7 +390,7 @@ class MySQLDriver extends DatabaseDriver
         }
         else
         {
-            throw new \Exception(printf('Error executing sql command: %s', $sql));
+            throw new \Exception(sprintf('Error executing sql command: %s', $sql));
         }
     }
 
