@@ -1,11 +1,12 @@
 <?php
 namespace mtoolkit\evolution\model\evolution;
+use mtoolkit\evolution\core\Identity;
 
 /**
  * Class Evolution
  * @package mtooolkit\evolution\model
  */
-class Evolution
+class Evolution implements Identity
 {
     /**
      * @var number
