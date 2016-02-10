@@ -1,11 +1,12 @@
 <?php
 namespace mtoolkit\evolution\model\settings;
+use mtoolkit\evolution\core\Identity;
 
 /**
  * Class Settings
  * @package mtooolkit\evolution\model\settings
  */
-class Settings
+class Settings implements Identity
 {
     /**
      * @var string
