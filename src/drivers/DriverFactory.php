@@ -8,7 +8,7 @@ use mtoolkit\evolution\model\settings\Settings;
  * Class Driver
  * @package mtooolkit\evolution\drivers
  */
-class Driver
+class DriverFactory
 {
     const MYSQL = 'mysql';
 
