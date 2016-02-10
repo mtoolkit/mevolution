@@ -5,6 +5,9 @@
   "minimum-stability": "stable",
   "license": "LGPL-3.0+",
   "type": "project",
+  "config": {
+    "vendor-dir": "libs"
+  },
   "authors": [
     {
       "name": "Michele Pagnin",
@@ -18,5 +21,10 @@
   },
   "require": {
     "php": ">=5.5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "mtoolkit\\evolution\\": "src/"
+    }
   }
 }

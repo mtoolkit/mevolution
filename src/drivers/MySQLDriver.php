@@ -5,7 +5,7 @@ use mtoolkit\evolution\drivers\exceptions\CleanEvolutionsTableException;
 use mtoolkit\evolution\drivers\exceptions\CreateEvolutionsTableException;
 use mtoolkit\evolution\drivers\exceptions\GetEvolutionsException;
 use mtoolkit\evolution\drivers\exceptions\InsertEvolutionException;
-use mtoolkit\evolution\drivers\exceptions\UpdateExecuteDateException;
+use mtoolkit\evolution\drivers\exceptions\DropEvolutionException;
 use mtoolkit\evolution\model\error\ErrorNumber;
 use mtoolkit\evolution\model\evolution\Evolution;
 use mtoolkit\evolution\model\settings\Settings;
@@ -174,7 +174,7 @@ class MySQLDriver extends DatabaseDriver
     /**
      * @param int $id Evolution id
      * @param \DateTime $executeDate
-     * @throws UpdateExecuteDateException
+     * @throws DropEvolutionException
      * @return void
      */
     public function updateExecuteDate($id, \DateTime $executeDate)
@@ -190,19 +190,19 @@ class MySQLDriver extends DatabaseDriver
 
         if ($result === false)
         {
-            throw new UpdateExecuteDateException();
+            throw new DropEvolutionException();
         }
     }
 
     /**
      * @param int $id Evolution id
-     * @throws UpdateExecuteDateException
+     * @throws DropEvolutionException
      */
-    public function dropExecuteDate($id)
+    public function dropEvolution( $id )
     {
         $connection = $this->getConnection();
 
-        $stmt = $connection->prepare("UPDATE mt_evolutions SET executed=NULL WHERE id=?;");
+        $stmt = $connection->prepare( "DELETE FROM mt_evolutions WHERE id=?;" );
         $stmt->bind_param('i', $id);
         $result = $stmt->execute();
 
@@ -211,7 +211,7 @@ class MySQLDriver extends DatabaseDriver
 
         if ($result === false)
         {
-            throw new UpdateExecuteDateException();
+            throw new DropEvolutionException();
         }
     }
 

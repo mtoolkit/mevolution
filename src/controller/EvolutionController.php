@@ -1,15 +1,16 @@
 <?php
 namespace mtoolkit\evolution\controller;
 
+use mtoolkit\evolution\core\Controller;
 use mtoolkit\evolution\drivers\DatabaseDriver;
-use mtoolkit\evolution\drivers\Driver;
+use mtoolkit\evolution\drivers\DriverFactory;
 use mtoolkit\evolution\exception\EvolutionFolderNotFoundException;
 use mtoolkit\evolution\exception\SettingsFileNotFoundException;
 use mtoolkit\evolution\model\evolution\EvolutionFile;
 use mtoolkit\evolution\model\settings\Settings;
 use mtoolkit\evolution\model\settings\SettingsFile;
 
-class MEvolution
+abstract class EvolutionController implements Controller
 {
     /**
      * @var string
@@ -59,7 +60,7 @@ class MEvolution
         }
 
         $this->settings = SettingsFile::parse($this->settingsFilePath);
-        $this->driver = Driver::get($this->settings);
+        $this->driver = DriverFactory::get( $this->settings );
         $this->filePathList = EvolutionFile::getList($this->evolutionsFolderPath);
     }
 
@@ -82,70 +83,39 @@ class MEvolution
     }
 
     /**
-     * Creates the table of the evolutions into the database.<br>
-     * Inserts the new evolutions in the table.
-     */
-    public function init()
-    {
-        echo 'Creating evolution table...' . PHP_EOL;
-        $this->driver->createEvolutionsTable();
-        $lastEvolutionId = $this->driver->getLastEvolutionId();
-
-        echo 'Updating evolution table...' . PHP_EOL;
-        foreach ($this->filePathList as $filePath) {
-            $evolution = EvolutionFile::getEvolution($filePath);
-
-            if ($lastEvolutionId < $evolution->getId()) {
-                $this->driver->insertEvolution(
-                    $evolution->getId(),
-                    $evolution->getUp(),
-                    $evolution->getDown()
-                );
-                echo sprintf("\tInserted evolution %s%s.", $evolution->getId(), PHP_EOL);
-            }
-        }
-
-        echo PHP_EOL . 'INIT completed without errors.' . PHP_EOL;
-    }
-
-    /**
-     * Applies the evolutions.
-     */
-    public function apply()
-    {
-        echo 'Applying evolutions...' . PHP_EOL;
-
-        if ($this->to == null) {
-            $this->to = $this->driver->getLastEvolutionId();
-        }
-
-        $this->driver->executeEvolutions($this->to);
-
-        echo PHP_EOL . 'APPLY completed without errors.' . PHP_EOL;
-    }
-
-    /**
-     * Reverts the evolutions.
-     */
-    public function revert()
-    {
-        echo 'Reverting evolutions...' . PHP_EOL;
-
-        if ($this->to == null) {
-            $this->to = 0;
-        }
-
-        $this->driver->executeDevolutions($this->to);
-
-        echo PHP_EOL . 'REVERT completed without errors.' . PHP_EOL;
-    }
-
-    /**
      * @return DatabaseDriver
      */
     public function getDriver()
     {
         return $this->driver;
     }
+
+    /**
+     * @return \string[]
+     */
+    public function getFilePathList()
+    {
+        return $this->filePathList;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTo()
+    {
+        return $this->to;
+    }
+
+    /**
+     * @param int $to
+     * @return EvolutionController
+     */
+    public function setTo( $to )
+    {
+        $this->to = $to;
+
+        return $this;
+    }
+
 
 }

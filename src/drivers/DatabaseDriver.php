@@ -3,7 +3,7 @@ namespace mtoolkit\evolution\drivers;
 
 use mtoolkit\evolution\drivers\exceptions\GetEvolutionsException;
 use mtoolkit\evolution\drivers\exceptions\InsertEvolutionException;
-use mtoolkit\evolution\drivers\exceptions\UpdateExecuteDateException;
+use mtoolkit\evolution\drivers\exceptions\DropEvolutionException;
 use mtoolkit\evolution\model\evolution\Evolution;
 use mtoolkit\evolution\model\settings\Settings;
 
@@ -53,9 +53,9 @@ abstract class DatabaseDriver
      * Sets to "<i>null</i>" the execution date of the evolution with id <i>$id</i>.
      *
      * @param int $id Evolution id
-     * @throws UpdateExecuteDateException
+     * @throws DropEvolutionException
      */
-    public abstract function dropExecuteDate($id);
+    public abstract function dropEvolution( $id );
 
     /**
      * @param $from
