@@ -146,7 +146,7 @@ class Main
     }
 }
 
-echo 'MEvolution v. 1.0.0' . PHP_EOL . PHP_EOL;
+echo 'MEvolution v. 1.2.0' . PHP_EOL . PHP_EOL;
 date_default_timezone_set( 'Europe/Rome' );
 $main = new Main( $argv );
 $main->run();
