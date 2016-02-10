@@ -349,7 +349,7 @@ class MySQLDriver extends DatabaseDriver
             {
                 echo sprintf("\tApplying devolution %s...\n", $evolution->getId());
                 $this->execute($evolution->getDown());
-                $this->dropExecuteDate($evolution->getId());
+                $this->dropEvolution($evolution->getId());
                 echo sprintf("\tDevolution %s applied without error.\n", $evolution->getId());
             }
 
